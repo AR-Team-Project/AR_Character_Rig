@@ -361,7 +361,29 @@ function onResults2(results) {
     let j2 = boneLeftForeArm.position.clone().normalize();
     let Rv12 = v12.clone().applyMatrix4(R0.clone().transpose());
     let R1 = computeR(j2, Rv12);
-    skeleton.getBoneByName("mixamorigLeftForeArm").setRotationFromMatrix(R0);
+    skeleton.getBoneByName("mixamorigLeftForeArm").setRotationFromMatrix(R1);
+    //console.log(boneLeftArm);
+    /////////////////////////////////////////////////////////////////////////////////
+
+    let jointRightShoulder = pos_3d_landmarks["right_shoulder"]; // p0
+    let jointRightElbow = pos_3d_landmarks["right_elbow"]; // p1
+    let boneRightArm = skeleton.getBoneByName("mixamorigRightForeArm"); // j1
+    v01 = new THREE.Vector3()
+      .subVectors(jointRightElbow, jointRightShoulder)
+      .normalize();
+    j1 = boneRightArm.position.clone().normalize();
+    R0 = computeR(j1, v01);
+    skeleton.getBoneByName("mixamorigRightArm").setRotationFromMatrix(R0);
+
+    let jointRightWrist = pos_3d_landmarks["right_wrist"]; // p2
+    let boneRightForeArm = skeleton.getBoneByName("mixamorigRightHand"); // j2
+    v12 = new THREE.Vector3()
+      .subVectors(jointRightWrist, jointRightElbow)
+      .normalize();
+    j2 = boneRightForeArm.position.clone().normalize();
+    Rv12 = v12.clone().applyMatrix4(R0.clone().transpose());
+    R1 = computeR(j2, Rv12);
+    skeleton.getBoneByName("mixamorigRightForeArm").setRotationFromMatrix(R1);
     //console.log(boneLeftArm);
   }
 
