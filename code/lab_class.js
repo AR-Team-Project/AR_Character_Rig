@@ -363,6 +363,37 @@ function onResults2(results) {
     let R1 = computeR(j2, Rv12);
     skeleton.getBoneByName("mixamorigLeftForeArm").setRotationFromMatrix(R1);
     //console.log(boneLeftArm);
+
+    let jointLeftThumb = pos_3d_landmarks["left_thumb"]; //
+    let boneLeftHandThumb = skeleton.getBoneByName("mixamorigLeftHandThumb4"); //
+    let v23 = new THREE.Vector3()
+      .subVectors(jointLeftThumb, jointLeftWrist)
+      .normalize();
+    let j3 = boneLeftHandThumb.position.clone().normalize();
+    let Rv23 = v23.clone().applyMatrix4(R1.clone().transpose());
+    let R2 = computeR(j3, Rv23);
+    skeleton.getBoneByName("mixamorigLeftHand").setRotationFromMatrix(R2);
+
+    let jointLeftIndex = pos_3d_landmarks["left_index"]; //
+    let boneLeftHandIndex4 = skeleton.getBoneByName("mixamorigLeftHandIndex4"); //
+    let v23_2 = new THREE.Vector3()
+      .subVectors(jointLeftIndex, jointLeftWrist)
+      .normalize();
+    let j3_2 = boneLeftHandIndex4.position.clone().normalize();
+    let Rv23_2 = v23_2.clone().applyMatrix4(R0.clone().transpose());
+    let R2_2 = computeR(j3_2, Rv23_2);
+    skeleton.getBoneByName("mixamorigLeftHand").setRotationFromMatrix(R2_2);
+
+    let jointLeftPinky = pos_3d_landmarks["left_pinky"]; //
+    let boneLeftHandPinky4 = skeleton.getBoneByName("mixamorigLeftHandPinky4"); //
+    let v23_3 = new THREE.Vector3()
+      .subVectors(jointLeftPinky, jointLeftWrist)
+      .normalize();
+    let j3_3 = boneLeftHandPinky4.position.clone().normalize();
+    let Rv23_3 = v23_3.clone().applyMatrix4(R0.clone().transpose());
+    let R2_3 = computeR(j3_3, Rv23_3);
+    skeleton.getBoneByName("mixamorigLeftHand").setRotationFromMatrix(R2_3);
+
     /////////////////////////////////////////////////////////////////////////////////
 
     let jointRightShoulder = pos_3d_landmarks["right_shoulder"]; // p0
