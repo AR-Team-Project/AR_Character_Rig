@@ -392,21 +392,21 @@ function onResults2(results) {
       test_points_aux.geometry.attributes.position.array[5]
     );
 
-    let centerSpine1 = centerHip.clone().lerp(centerShoulder, 0.25);
-    let centerSpine2 = centerHip.clone().lerp(centerShoulder, 0.5);
-    let centerSpine3 = centerHip.clone().lerp(centerShoulder, 0.75);
+    let centerSpine = centerHip.clone().lerp(centerShoulder, 0.25);
+    let centerSpine1 = centerHip.clone().lerp(centerShoulder, 0.5);
+    let centerSpine2 = centerHip.clone().lerp(centerShoulder, 0.75);
 
-    test_points_aux.geometry.attributes.position.array[6] = centerSpine1.x;
-    test_points_aux.geometry.attributes.position.array[7] = centerSpine1.y;
-    test_points_aux.geometry.attributes.position.array[8] = centerSpine1.z;
+    test_points_aux.geometry.attributes.position.array[6] = centerSpine.x;
+    test_points_aux.geometry.attributes.position.array[7] = centerSpine.y;
+    test_points_aux.geometry.attributes.position.array[8] = centerSpine.z;
 
-    test_points_aux.geometry.attributes.position.array[9] = centerSpine2.x;
-    test_points_aux.geometry.attributes.position.array[10] = centerSpine2.y;
-    test_points_aux.geometry.attributes.position.array[11] = centerSpine2.z;
+    test_points_aux.geometry.attributes.position.array[9] = centerSpine1.x;
+    test_points_aux.geometry.attributes.position.array[10] = centerSpine1.y;
+    test_points_aux.geometry.attributes.position.array[11] = centerSpine1.z;
 
-    test_points_aux.geometry.attributes.position.array[12] = centerSpine3.x;
-    test_points_aux.geometry.attributes.position.array[13] = centerSpine3.y;
-    test_points_aux.geometry.attributes.position.array[14] = centerSpine3.z;
+    test_points_aux.geometry.attributes.position.array[12] = centerSpine2.x;
+    test_points_aux.geometry.attributes.position.array[13] = centerSpine2.y;
+    test_points_aux.geometry.attributes.position.array[14] = centerSpine2.z;
 
     function getRandomInt(max) {
       return Math.floor(Math.random() * max);
@@ -444,6 +444,13 @@ function onResults2(results) {
     let Rv12, Rv23, Rv23_2, Rv23_3;
     let v01, v12, v23;
     let v23_2, v23_3;
+
+    let boneSpine = skeleton.getBoneByName("mixamorigSpine"); // j1
+
+    v01 = new THREE.Vector3().subVectors(centerSpine, centerHip).normalize();
+    j1 = boneSpine.position.clone().normalize();
+    R0 = computeR(j1, v01);
+    skeleton.getBoneByName("mixamorigHips").setRotationFromMatrix(R0);
 
     let jointLeftShoulder = pos_3d_landmarks["left_shoulder"]; // p0
     let jointLeftElbow = pos_3d_landmarks["left_elbow"]; // p1
