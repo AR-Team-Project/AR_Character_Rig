@@ -183,11 +183,26 @@ const test_points = new THREE.Points(
     sizeAttenuation: true,
   })
 );
+
+const test_points_aux = new THREE.Points(
+  new THREE.BufferGeometry(),
+  new THREE.PointsMaterial({
+    color: 0x0000ff,
+    size: 0.1,
+    sizeAttenuation: true,
+  })
+);
 test_points.geometry.setAttribute(
   "position",
   new THREE.BufferAttribute(new Float32Array(33 * 3), 3)
 );
+
+test_points_aux.geometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(new Float32Array(10 * 3), 3)
+);
 scene.add(test_points);
+scene.add(test_points_aux);
 
 function computeR(A, B) {
   // get unit vectors
@@ -339,6 +354,50 @@ function onResults2(results) {
     }
     test_points.geometry.attributes.position.needsUpdate = true;
 
+    test_points_aux.geometry.attributes.position.array[0] =
+      (test_points.geometry.attributes.position.array[69] +
+        test_points.geometry.attributes.position.array[72]) /
+      2;
+    test_points_aux.geometry.attributes.position.array[1] =
+      (test_points.geometry.attributes.position.array[70] +
+        test_points.geometry.attributes.position.array[73]) /
+      2;
+    test_points_aux.geometry.attributes.position.array[2] =
+      (test_points.geometry.attributes.position.array[71] +
+        test_points.geometry.attributes.position.array[74]) /
+      2;
+
+    test_points_aux.geometry.attributes.position.array[3] =
+      (test_points.geometry.attributes.position.array[33] +
+        test_points.geometry.attributes.position.array[36]) /
+      2;
+    test_points_aux.geometry.attributes.position.array[4] =
+      (test_points.geometry.attributes.position.array[34] +
+        test_points.geometry.attributes.position.array[37]) /
+      2;
+    test_points_aux.geometry.attributes.position.array[5] =
+      (test_points.geometry.attributes.position.array[35] +
+        test_points.geometry.attributes.position.array[38]) /
+      2;
+
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
+
+    test_points_aux.geometry.attributes.position.needsUpdate = true;
+
+    skeleton.bones[0].position.x =
+      test_points_aux.geometry.attributes.position.array[0] * 100;
+    skeleton.bones[0].position.y =
+      test_points_aux.geometry.attributes.position.array[1] * 100;
+    skeleton.bones[0].position.z =
+      test_points_aux.geometry.attributes.position.array[2] * 100;
+    console.log(
+      skeleton.bones[0].position.x,
+      skeleton.bones[0].position.y,
+      skeleton.bones[0].position.z
+    );
+
     // rigging //
     //mixamorigLeftArm : left_shoulder
     //mixamorigLeftForeArm : left_elbow
@@ -357,9 +416,13 @@ function onResults2(results) {
     let Rv12, Rv23, Rv23_2, Rv23_3;
     let v01, v12, v23;
     let v23_2, v23_3;
+
+    console.log(skeleton);
+
     let jointLeftShoulder = pos_3d_landmarks["left_shoulder"]; // p0
     let jointLeftElbow = pos_3d_landmarks["left_elbow"]; // p1
     let boneLeftArm = skeleton.getBoneByName("mixamorigLeftForeArm"); // j1
+
     v01 = new THREE.Vector3()
       .subVectors(jointLeftElbow, jointLeftShoulder)
       .normalize();
@@ -409,9 +472,17 @@ function onResults2(results) {
     skeleton.getBoneByName("mixamorigLeftHand").setRotationFromMatrix(R2_3);
 
     // Left Lower -------------------------------------------------------------------
+
     let jointLeftHip = pos_3d_landmarks["left_hip"]; // p0
     let jointLeftKnee = pos_3d_landmarks["left_knee"]; // p1
     let boneLeftLeg = skeleton.getBoneByName("mixamorigLeftLeg"); // j1
+
+    v01 = new THREE.Vector3()
+      .subVectors(jointLeftKnee, jointLeftHip)
+      .normalize();
+    j1 = boneLeftLeg.position.clone().normalize();
+    R0 = computeR(j1, v01);
+    skeleton.getBoneByName("mixamorigLeftUpLeg").setRotationFromMatrix(R0);
     v01 = new THREE.Vector3()
       .subVectors(jointLeftKnee, jointLeftHip)
       .normalize();
