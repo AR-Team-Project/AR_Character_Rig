@@ -199,7 +199,7 @@ test_points.geometry.setAttribute(
 
 test_points_aux.geometry.setAttribute(
   "position",
-  new THREE.BufferAttribute(new Float32Array(10 * 3), 3)
+  new THREE.BufferAttribute(new Float32Array(33 * 3), 3)
 );
 scene.add(test_points);
 scene.add(test_points_aux);
@@ -380,6 +380,34 @@ function onResults2(results) {
         test_points.geometry.attributes.position.array[38]) /
       2;
 
+    let centerHip = new THREE.Vector3(
+      test_points_aux.geometry.attributes.position.array[0],
+      test_points_aux.geometry.attributes.position.array[1],
+      test_points_aux.geometry.attributes.position.array[2]
+    );
+
+    let centerShoulder = new THREE.Vector3(
+      test_points_aux.geometry.attributes.position.array[3],
+      test_points_aux.geometry.attributes.position.array[4],
+      test_points_aux.geometry.attributes.position.array[5]
+    );
+
+    let centerSpine1 = centerHip.clone().lerp(centerShoulder, 0.25);
+    let centerSpine2 = centerHip.clone().lerp(centerShoulder, 0.5);
+    let centerSpine3 = centerHip.clone().lerp(centerShoulder, 0.75);
+
+    test_points_aux.geometry.attributes.position.array[6] = centerSpine1.x;
+    test_points_aux.geometry.attributes.position.array[7] = centerSpine1.y;
+    test_points_aux.geometry.attributes.position.array[8] = centerSpine1.z;
+
+    test_points_aux.geometry.attributes.position.array[9] = centerSpine2.x;
+    test_points_aux.geometry.attributes.position.array[10] = centerSpine2.y;
+    test_points_aux.geometry.attributes.position.array[11] = centerSpine2.z;
+
+    test_points_aux.geometry.attributes.position.array[12] = centerSpine3.x;
+    test_points_aux.geometry.attributes.position.array[13] = centerSpine3.y;
+    test_points_aux.geometry.attributes.position.array[14] = centerSpine3.z;
+
     function getRandomInt(max) {
       return Math.floor(Math.random() * max);
     }
@@ -416,8 +444,6 @@ function onResults2(results) {
     let Rv12, Rv23, Rv23_2, Rv23_3;
     let v01, v12, v23;
     let v23_2, v23_3;
-
-    console.log(skeleton);
 
     let jointLeftShoulder = pos_3d_landmarks["left_shoulder"]; // p0
     let jointLeftElbow = pos_3d_landmarks["left_elbow"]; // p1
