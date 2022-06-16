@@ -80,12 +80,19 @@ const grid_helper = new THREE.GridHelper(1000, 1000);
 grid_helper.rotation.x = Math.PI / 2;
 ground_mesh.add(grid_helper);
 
+const skinnedMesh = new SkinnedMesh();
 let model,
   skeleton = null,
   skeleton_helper,
   mixer,
   numAnimations;
 let axis_helpers = [];
+let rightArmIkSolver,
+  leftArmIKSolver,
+  rightLegIkSolver,
+  leftLegIKSolver,
+  bodyIKSolver;
+
 const loader = new GLTFLoader();
 loader.load("../models/gltf/Jaygo.glb", function (gltf) {
   model = gltf.scene;
@@ -94,7 +101,6 @@ loader.load("../models/gltf/Jaygo.glb", function (gltf) {
   let bones = [];
   model.traverse(function (object) {
     if (object.isMesh) object.castShadow = true;
-
     //console.log(object.isBone);
     if (object.isBone) {
       // https://stackoverflow.com/questions/13309289/three-js-geometry-on-top-of-another
@@ -117,12 +123,52 @@ loader.load("../models/gltf/Jaygo.glb", function (gltf) {
   });
 
   skeleton = new THREE.Skeleton(bones);
-
+  skinnedMesh.bind(skeleton);
   skeleton_helper = new THREE.SkeletonHelper(model);
   skeleton_helper.visible = true;
 
-  scene.add(skeleton_helper);
+  const rightArmIks = [
+    {
+      target: 30, // "target"
+      effector: 30, // "bone3"
+      links: [{ index: 29 }, { index: 28 }, { index: 27 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const leftArmIks = [
+    {
+      target: 10, // "target"
+      effector: 10, // "bone3"
+      links: [{ index: 9 }, { index: 8 }, { index: 7 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const rightLegIks = [
+    {
+      target: 54, // "target"
+      effector: 54, // "bone3"
+      links: [{ index: 53 }, { index: 52 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const leftLegIks = [
+    {
+      target: 49, // "target"
+      effector: 49, // "bone3"
+      links: [{ index: 48 }, { index: 47 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const bodyIks = [
+    {
+      target: 3, // "target"
+      effector: 3, // "bone3"
+      links: [{ index: 2 }, { index: 1 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  rightArmIkSolver = new CCDIKSolver(skinnedMesh, rightArmIks);
+  leftArmIKSolver = new CCDIKSolver(skinnedMesh, leftArmIks);
+  rightLegIkSolver = new CCDIKSolver(skinnedMesh, rightLegIks);
+  leftLegIKSolver = new CCDIKSolver(skinnedMesh, leftLegIks);
+  bodyIKSolver = new CCDIKSolver(skinnedMesh, bodyIks);
 
+  scene.add(skeleton_helper);
   //const animations = gltf.animations;
   //mixer = new THREE.AnimationMixer( model );
 
@@ -259,52 +305,6 @@ function onResults2(results) {
   if (!results.poseLandmarks) {
     return;
   }
-
-  const skinnedMesh = new SkinnedMesh();
-  skinnedMesh.bind(skeleton);
-  const rightArmIks = [
-    {
-      target: 30, // "target"
-      effector: 30, // "bone3"
-      links: [{ index: 29 }, { index: 28 }, { index: 27 }], // "bone2", "bone1", "bone0"
-    },
-  ];
-  const leftArmIks = [
-    {
-      target: 10, // "target"
-      effector: 10, // "bone3"
-      links: [{ index: 9 }, { index: 8 }, { index: 7 }], // "bone2", "bone1", "bone0"
-    },
-  ];
-  const rightLegIks = [
-    {
-      target: 54, // "target"
-      effector: 54, // "bone3"
-      links: [{ index: 53 }, { index: 52 }], // "bone2", "bone1", "bone0"
-    },
-  ];
-  const leftLegIks = [
-    {
-      target: 49, // "target"
-      effector: 49, // "bone3"
-      links: [{ index: 48 }, { index: 47 }], // "bone2", "bone1", "bone0"
-    },
-  ];
-  const bodyIks = [
-    {
-      target: 3, // "target"
-      effector: 3, // "bone3"
-      links: [{ index: 2 }, { index: 1 }], // "bone2", "bone1", "bone0"
-    },
-  ];
-
-  let rightArmIkSolver = new CCDIKSolver(skinnedMesh, rightArmIks);
-  let leftArmIKSolver = new CCDIKSolver(skinnedMesh, leftArmIks);
-  let rightLegIkSolver = new CCDIKSolver(skinnedMesh, rightLegIks);
-  let leftLegIKSolver = new CCDIKSolver(skinnedMesh, leftLegIks);
-  let bodyIKSolver = new CCDIKSolver(skinnedMesh, bodyIks);
-  console.log(skeleton.bones);
-
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
   canvasCtx.drawImage(
@@ -454,10 +454,6 @@ function onResults2(results) {
     test_points_aux.geometry.attributes.position.array[12] = centerSpine2.x;
     test_points_aux.geometry.attributes.position.array[13] = centerSpine2.y;
     test_points_aux.geometry.attributes.position.array[14] = centerSpine2.z;
-
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * max);
-    }
 
     test_points_aux.geometry.attributes.position.needsUpdate = true;
 
