@@ -262,14 +262,47 @@ function onResults2(results) {
 
   const skinnedMesh = new SkinnedMesh();
   skinnedMesh.bind(skeleton);
-  const iks = [
+  const rightArmIks = [
     {
-      target: 51, // "target"
-      effector: 50, // "bone3"
-      links: [{ index: 49 }, { index: 48 }, { index: 47 }], // "bone2", "bone1", "bone0"
+      target: 30, // "target"
+      effector: 30, // "bone3"
+      links: [{ index: 29 }, { index: 28 }, { index: 27 }], // "bone2", "bone1", "bone0"
     },
   ];
-  let ikSolver = new CCDIKSolver(skinnedMesh, iks);
+  const leftArmIks = [
+    {
+      target: 10, // "target"
+      effector: 10, // "bone3"
+      links: [{ index: 9 }, { index: 8 }, { index: 7 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const rightLegIks = [
+    {
+      target: 54, // "target"
+      effector: 54, // "bone3"
+      links: [{ index: 53 }, { index: 52 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const leftLegIks = [
+    {
+      target: 49, // "target"
+      effector: 49, // "bone3"
+      links: [{ index: 48 }, { index: 47 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  const bodyIks = [
+    {
+      target: 3, // "target"
+      effector: 3, // "bone3"
+      links: [{ index: 2 }, { index: 1 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+
+  let rightArmIkSolver = new CCDIKSolver(skinnedMesh, rightArmIks);
+  let leftArmIKSolver = new CCDIKSolver(skinnedMesh, leftArmIks);
+  let rightLegIkSolver = new CCDIKSolver(skinnedMesh, rightLegIks);
+  let leftLegIKSolver = new CCDIKSolver(skinnedMesh, leftLegIks);
+  let bodyIKSolver = new CCDIKSolver(skinnedMesh, bodyIks);
   console.log(skeleton.bones);
 
   canvasCtx.save();
@@ -637,7 +670,11 @@ function onResults2(results) {
       skeleton.getBoneByName("RightFoot").setRotationFromMatrix(R2);
     })();
   }
-  ikSolver.update();
+  rightArmIkSolver.update();
+  leftArmIKSolver.update();
+  rightLegIkSolver.update();
+  leftLegIKSolver.update();
+  bodyIKSolver.update();
   renderer.render(scene, camera_ar);
   canvasCtx.restore();
 }
