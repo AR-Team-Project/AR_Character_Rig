@@ -10,6 +10,8 @@ import "../node_modules/@mediapipe/pose/pose.js";
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import { SkinnedMesh } from "three";
+import { CCDIKSolver } from "../node_modules/three/examples/jsm/animation/CCDIKSolver.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 const render_w = videoElement.videoWidth;
@@ -258,6 +260,18 @@ function onResults2(results) {
     return;
   }
 
+  const skinnedMesh = new SkinnedMesh();
+  skinnedMesh.bind(skeleton);
+  const iks = [
+    {
+      target: 51, // "target"
+      effector: 50, // "bone3"
+      links: [{ index: 49 }, { index: 48 }, { index: 47 }], // "bone2", "bone1", "bone0"
+    },
+  ];
+  let ikSolver = new CCDIKSolver(skinnedMesh, iks);
+  console.log(skeleton.bones);
+
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
   canvasCtx.drawImage(
@@ -420,11 +434,11 @@ function onResults2(results) {
       test_points_aux.geometry.attributes.position.array[1] * 100;
     skeleton.bones[0].position.z =
       test_points_aux.geometry.attributes.position.array[2] * 100;
-    console.log(
-      skeleton.bones[0].position.x,
-      skeleton.bones[0].position.y,
-      skeleton.bones[0].position.z
-    );
+    // console.log(
+    //   skeleton.bones[0].position.x,
+    //   skeleton.bones[0].position.y,
+    //   skeleton.bones[0].position.z
+    // );
 
     let rig = (() => {
       // rigging //
@@ -623,7 +637,7 @@ function onResults2(results) {
       skeleton.getBoneByName("RightFoot").setRotationFromMatrix(R2);
     })();
   }
-
+  ikSolver.update();
   renderer.render(scene, camera_ar);
   canvasCtx.restore();
 }
